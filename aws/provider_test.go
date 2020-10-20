@@ -528,6 +528,15 @@ func testAccEC2ClassicPreCheck(t *testing.T) {
 	}
 }
 
+// testAccReachableRegionPreCheck checks whether the partition of the current region includes the given region
+func testAccReachableRegionPreCheck(region string, t *testing.T) {
+	if partition, ok := endpoints.PartitionForRegion(endpoints.DefaultPartitions(), testAccGetRegion()); ok {
+		if _, ok := partition.Regions()[region]; !ok {
+			t.Skip(fmt.Sprintf("skipping test; partition %s does not have %s region", partition.ID(), region))
+		}
+	}
+}
+
 func testAccEC2VPCOnlyPreCheck(t *testing.T) {
 	client := testAccProvider.Meta().(*AWSClient)
 	platforms := client.supportedplatforms
